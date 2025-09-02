@@ -3,7 +3,6 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:dashboard_admin/controllers/category_controller.dart';
 import 'package:dashboard_admin/core/URL/url.dart';
 import 'package:dashboard_admin/core/utils/custom_toast_noti.dart';
 import 'package:dashboard_admin/models/category_model.dart';
@@ -38,8 +37,8 @@ class ProductController extends GetxController {
   late TextEditingController brandController;
   late TextEditingController stockController;
 
-  final CategoryController categoryController = Get.find<CategoryController>();
-  List<CategoryModel> get categoryList => categoryController.categories;
+  // final CategoryController categoryController = Get.find<CategoryController>();
+  // List<CategoryModel> get categoryList => categoryController.categories;
 
   final isEditing = false.obs;
   final isSaving = false.obs;
