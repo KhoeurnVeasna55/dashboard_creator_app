@@ -36,5 +36,3 @@ Flutter app for creators to interact with products and manage their content.
 - Browse products and categories  
 - View banners and offers  
 - User-friendly design  
-
----
