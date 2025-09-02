@@ -1,0 +1,69 @@
+name: dashboard_admin
+description: "A new Flutter project."
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  sidebarx: ^0.17.1
+  lucide_icons_flutter: ^3.0.3
+  get_storage: ^2.1.1
+  get: ^4.7.2
+  flutter_dotenv: ^5.2.1
+  http: ^1.4.0
+  jwt_decoder: ^2.0.1
+  image_picker: ^1.1.2
+  toastification: ^3.0.3
+  flutter_screenutil: ^5.9.3
+  equatable: ^2.0.7
+  intl: 0.20.2
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    # - assets/images/
+    # - assets/icons/
+    - assets/logo/Logo.jpg
+    - assets/fonts/
+    - .env
+  fonts:
+    - family: Battambang
+      fonts:
+        - asset: assets/fonts/km/Battambang-Black.ttf
+          weight: 900
+        - asset: assets/fonts/km/Battambang-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/km/Battambang-Light.ttf
+          weight: 300
+        - asset: assets/fonts/km/Battambang-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/km/Battambang-Thin.ttf
+          weight: 100
+    
+    - family: Koulen
+      fonts:
+        - asset: assets/fonts/km/Koulen-Regular.ttf
+          weight: 400
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/en/Poppins-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/en/Poppins-Medium.ttf
+          weight: 500
+    
+    
