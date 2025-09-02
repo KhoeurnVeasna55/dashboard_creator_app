@@ -177,60 +177,60 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
 
                               // Category
                               buildLabel('Category *'),
-                              Obx(() {
-                                if (_productController
-                                    .categoryController
-                                    .isLoading) {
-                                  return Container(
-                                    height: 60,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withAlpha(40),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  );
-                                }
+                              // Obx(() {
+                              //   if (_productController
+                              //       .categoryController
+                              //       .isLoading) {
+                              //     return Container(
+                              //       height: 60,
+                              //       decoration: BoxDecoration(
+                              //         color: Colors.white.withAlpha(40),
+                              //         borderRadius: BorderRadius.circular(12),
+                              //       ),
+                              //       child: const Center(
+                              //         child: CircularProgressIndicator(),
+                              //       ),
+                              //     );
+                              //   }
 
-                                return DropdownButtonFormField<CategoryModel>(
-                                  items: _productController.categoryList.map((
-                                    category,
-                                  ) {
-                                    return DropdownMenuItem<CategoryModel>(
-                                      value: category,
-                                      child: Text(
-                                        category.name ?? 'No Name',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
+                              //   return DropdownButtonFormField<CategoryModel>(
+                              //     items: _productController.categoryList.map((
+                              //       category,
+                              //     ) {
+                              //       return DropdownMenuItem<CategoryModel>(
+                              //         value: category,
+                              //         child: Text(
+                              //           category.name ?? 'No Name',
+                              //           style: const TextStyle(
+                              //             color: Colors.white,
+                              //           ),
+                              //         ),
+                              //       );
+                              //     }).toList(),
 
-                                  value:
-                                      _productController.selectedCategory.value,
+                              //     value:
+                              //         _productController.selectedCategory.value,
 
-                                  onChanged: (newValue) {
-                                    _productController.selectedCategory.value =
-                                        newValue;
-                                  },
+                              //     onChanged: (newValue) {
+                              //       _productController.selectedCategory.value =
+                              //           newValue;
+                              //     },
 
-                                  hint: const Text(
-                                    'Select a category',
-                                    style: TextStyle(color: Colors.white70),
-                                  ),
+                              //     hint: const Text(
+                              //       'Select a category',
+                              //       style: TextStyle(color: Colors.white70),
+                              //     ),
 
-                                  decoration: inputDecoration(
-                                    hintText: 'Select a category',
-                                  ),
-                                  dropdownColor: const Color(0xFF171A3B),
+                              //     decoration: inputDecoration(
+                              //       hintText: 'Select a category',
+                              //     ),
+                              //     dropdownColor: const Color(0xFF171A3B),
 
-                                  validator: (value) => value == null
-                                      ? 'Please select a category'
-                                      : null,
-                                );
-                              }),
+                              //     validator: (value) => value == null
+                              //         ? 'Please select a category'
+                              //         : null,
+                              //   );
+                              // }),
 
                               // Brand
                               buildLabel('Brand *'),

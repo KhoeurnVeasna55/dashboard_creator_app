@@ -14,7 +14,7 @@ class MainCategory extends StatelessWidget {
     return Obx(() {
       return IndexedStack(
         index: controller.currentIndex.value,
-        children: [CategoryScreen(), CreateCategoryScreen()],
+        children: [CategoryPage(), CreateCategoryScreen()],
       );
     });
   }

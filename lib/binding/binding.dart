@@ -1,7 +1,7 @@
 import 'package:dashboard_admin/controllers/auth_controller.dart';
-import 'package:dashboard_admin/controllers/category_controller.dart';
 import 'package:dashboard_admin/controllers/product_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
+import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
