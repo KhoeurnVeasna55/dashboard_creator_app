@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:dashboard_admin/core/utils/custom_toast_noti.dart';
 import 'package:dashboard_admin/core/utils/header_util.dart';
 import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:dashboard_admin/services/store_token.dart';
@@ -43,18 +44,27 @@ class CategoryServiceApi {
   }) async {
     try {
       final token = await StoreToken().getToken();
-      final uri = Uri.parse('$URL/api/categories/$id');
-      final resp = await http.patch(
+      final uri = Uri.parse('$URL/api/categories/status');
+      final resp = await http.post(
         uri,
         headers: header(token: token ?? ""),
-        body: json.encode({'isActive': isActive}),
+        body: json.encode({'isActive': isActive,"id": id}),
       );
+
+      if(resp.statusCode == 200){
+        CustomToastNoti.show( title: "Success", description: json.decode(resp.body)['message']);
+      }
       if (resp.statusCode != 200) {
         throw Exception(
           'Failed to update status: ${resp.statusCode} ${resp.body}',
         );
       }
+
       final data = json.decode(resp.body) as Map<String, dynamic>;
+      CustomToastNoti.show(
+        title: "ERROR",
+        description: data['message'],
+      );
       return Category.fromJson(data);
     } catch (e) {
       if (kDebugMode) {
@@ -121,4 +131,31 @@ class CategoryServiceApi {
       return null;
     }
   }
+
+Future<void> deleteCategory({required String id}) async {
+  try {
+    final token = await StoreToken().getToken();
+    final uri = Uri.parse('$URL/api/categories/$id');
+    final resp = await http.delete(
+      uri,
+      headers: header(token: token ?? ""),
+    );
+    if (resp.statusCode != 200) {
+      throw Exception('Failed to delete category: ${resp.statusCode} ${resp.body}');
+    }
+    CustomToastNoti.show(
+      title: 'Success',
+      description: 'Category deleted successfully',
+    );
+  } catch (e) {
+    if (kDebugMode) {
+      print('Error deleting category: $e');
+    }
+    CustomToastNoti.show(
+      title: 'Error',
+      description: 'Failed to delete category: $e',
+    );
+    rethrow;
+  }
+}
 }

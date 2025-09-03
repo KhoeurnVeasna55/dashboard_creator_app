@@ -1,6 +1,5 @@
 import 'package:dashboard_admin/controllers/product_controller.dart';
 import 'package:dashboard_admin/core/utils/custom_toast_noti.dart';
-import 'package:dashboard_admin/models/category_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -271,15 +270,8 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
                                                   _productController
                                                       .pickedImageFiles
                                                       .isEmpty) {
-                                                Get.snackbar(
-                                                  'Missing Images',
-                                                  'Please select at least one product image',
-                                                  backgroundColor:
-                                                      Colors.orange,
-                                                  colorText: Colors.white,
-                                                );
+                                             
                                                 CustomToastNoti.show(
-                                                  context: context,
                                                   title: 'Missing Image',
                                                   description:
                                                       'Please select at least one product image',

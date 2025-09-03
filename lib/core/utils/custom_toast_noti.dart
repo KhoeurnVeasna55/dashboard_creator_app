@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';
 
 class CustomToastNoti {
   static void show({
-    required BuildContext context,
     required String title,
     required String description,
     ToastificationType type = ToastificationType.success,
@@ -32,8 +32,11 @@ class CustomToastNoti {
         break;
     }
 
+    final ctx =  Get.context;
+    if (ctx == null) return;
+
     toastification.show(
-      context: context,
+      context: ctx,
       type: type,
       style: ToastificationStyle.flat,
       autoCloseDuration: duration,

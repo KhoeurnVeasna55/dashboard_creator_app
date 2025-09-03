@@ -54,7 +54,7 @@ Widget _buildDesktopLayout(
           children: [
             Row(
               children: [
-                GestureDetector(
+                InkWell(
                   onTap: () => screenController.toggleChange(0),
                   child: Container(
                     padding: const EdgeInsets.all(10),
@@ -65,6 +65,8 @@ Widget _buildDesktopLayout(
                     child: const Icon(LucideIcons.arrowLeft, color: Colors.white),
                   ),
                 ),
+
+
                 const SizedBox(width: 20),
                 Expanded(
                   child: Center(
