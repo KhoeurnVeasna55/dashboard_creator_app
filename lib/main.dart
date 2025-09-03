@@ -15,8 +15,5 @@ void main() async {
 
   StoreToken.initialize();
   Get.put(AuthController());
-
-
-  print(await StoreToken().getToken());
   runApp(const MyApp());
 }

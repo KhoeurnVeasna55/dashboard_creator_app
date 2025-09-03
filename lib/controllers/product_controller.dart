@@ -179,7 +179,7 @@ class ProductController extends GetxController {
         brandController.text.isEmpty ||
         selectedCategory.value == null) {
       CustomToastNoti.show(
-        context: context,
+        
         title: 'Error',
         description: 'Please filed all the data',
         type: ToastificationType.error,
@@ -191,7 +191,7 @@ class ProductController extends GetxController {
     final stock = int.tryParse(stockController.text);
     if (price == null || stock == null) {
       CustomToastNoti.show(
-        context: context,
+        
         title: 'Error',
         description: 'Price and Stock must be valid numbers.',
         type: ToastificationType.error,
@@ -246,7 +246,7 @@ class ProductController extends GetxController {
 
         CustomToastNoti.show(
           title: 'Success!',
-          context: context,
+          
           description: 'Product created and added to list!',
           type: ToastificationType.success,
         );
@@ -254,7 +254,7 @@ class ProductController extends GetxController {
         log("🎉 Product creation flow completed");
       } else {
         CustomToastNoti.show(
-          context: context,
+          
           title: 'Error',
           description: 'Something went wrong.',
           type: ToastificationType.error,
@@ -263,7 +263,7 @@ class ProductController extends GetxController {
       }
     } catch (e) {
       CustomToastNoti.show(
-        context: context,
+        
         title: 'Error',
         description: 'Unexpected error: $e',
         type: ToastificationType.error,
@@ -300,7 +300,7 @@ class ProductController extends GetxController {
 
       CustomToastNoti.show(
         title: 'Success!',
-        context: context,
+        
         description: 'Product was deleted successfully.',
         type: ToastificationType.success,
       );
@@ -308,7 +308,7 @@ class ProductController extends GetxController {
     } catch (e) {
       log("Error deleting product: $e");
       CustomToastNoti.show(
-        context: context,
+        
         title: 'Error',
         description: 'Could not delete product.',
         type: ToastificationType.error,

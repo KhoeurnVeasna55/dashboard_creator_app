@@ -1,4 +1,3 @@
-
 import 'package:dashboard_admin/core/utils/custom_toast_noti.dart';
 import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:dashboard_admin/services/category_service_api.dart';
@@ -8,7 +7,7 @@ import 'package:get/get.dart';
 /// GetX Controller
 /// ---------------------------
 class CategoryController extends GetxController {
-  final CategoryServiceApi api= CategoryServiceApi();
+  final CategoryServiceApi api = CategoryServiceApi();
 
   final items = <Category>[].obs;
   final loading = false.obs;
@@ -106,35 +105,55 @@ class CategoryController extends GetxController {
   // Inline toggle (single)
   Future<void> toggleStatus(Category c) async {
     try {
-      final updated =
-          await api.updateCategoryStatus(id: c.id, isActive: !c.isActive);
+      final updated = await api.updateCategoryStatus(
+        id: c.id,
+        isActive: !(c.isActive),
+      );
       final idx = items.indexWhere((x) => x.id == c.id);
-      if (idx != -1) {
-        items[idx] = updated!;
+      if (idx != -1 && updated != null) {
+        items[idx] = updated;
         items.refresh();
       }
+      await load(toPage: page.value);
     } catch (e) {
-      CustomToastNoti.show(context: Get.context!, title: 'Update failed', description: 'Bulk update failed$e');
+      CustomToastNoti.show(
+        title: 'Update failed',
+        description: 'Update failed: $e',
+      );
     }
   }
 
-  // Bulk activate/deactivate selected
-  Future<void> bulkSetStatus(bool active) async {
+  // --- NEW: Bulk delete selected
+  Future<void> bulkDelete() async {
     if (selected.isEmpty) return;
     loading.value = true;
     try {
-      // naive sequential; for prod you might create a batch endpoint
-      for (final id in selected.toList()) {
-        await api.updateCategoryStatus(id: id, isActive: active);
+      // Prefer a batch endpoint if available; here, naive sequential deletes.
+      final ids = selected.toList();
+      for (final id in ids) {
+        await api.deleteCategory(id: id); // <-- ensure this exists in your API
       }
-      await load(toPage: page.value); 
-      Get.snackbar('Updated',
-          'Status set to ${active ? "Active" : "Inactive"} for selected',
-          snackPosition: SnackPosition.BOTTOM);
+      await load(toPage: page.value);
+      CustomToastNoti.show(
+        title: 'Deleted',
+        description: '${ids.length} item(s) deleted.',
+      );
     } catch (e) {
-      CustomToastNoti.show(context: Get.context!, title: "ERROR", description: 'Bulk update failed$e');
+      CustomToastNoti.show(
+        title: "ERROR",
+        description: 'Bulk delete failed: $e',
+      );
     } finally {
       loading.value = false;
     }
+  }
+
+  // --- NEW: Create action (stub – open your form/sheet/dialog)
+  Future<void> create() async {
+    // TODO: open your create form/sheet. For now, just a toast.
+    CustomToastNoti.show(
+      title: 'Create',
+      description: 'Open create dialog here.',
+    );
   }
 }
