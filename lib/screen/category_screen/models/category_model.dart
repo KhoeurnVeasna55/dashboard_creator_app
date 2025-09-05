@@ -1,9 +1,6 @@
 
 import 'package:dashboard_admin/models/pagination_meta.dart';
 
-/// ---------------------------
-/// Models
-/// ---------------------------
 class Category {
   final String id;
   final String name;

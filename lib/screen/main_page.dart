@@ -1,3 +1,4 @@
+import 'package:dashboard_admin/screen/banner_screen/screen/main_banner_screen.dart';
 import 'package:dashboard_admin/screen/category_screen/main_category.dart';
 import 'package:dashboard_admin/screen/home_ds.dart';
 import 'package:dashboard_admin/screen/products-screen/main_product_screen.dart';
@@ -47,6 +48,8 @@ class MainPage extends StatelessWidget {
                           return MainProductScreen();
                         case 2:
                           return MainCategory();
+                        case 3:
+                          return MainBannerScreen();
                         default:
                           return Center(child: Text('Page not found'));
                       }

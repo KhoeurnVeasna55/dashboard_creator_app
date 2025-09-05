@@ -1,111 +1,748 @@
-import 'package:dashboard_admin/core/responsive.dart';
+import 'package:dashboard_admin/core/utils/app_colors.dart';
 import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
+import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CreateCategoryScreen extends StatelessWidget {
   CreateCategoryScreen({super.key});
-  final CategoryScreenController screenController =
-      Get.find<CategoryScreenController>();
+
+  // Use the CategoryController which already has integrated image handling
+  final CategoryController categoryController = Get.find<CategoryController>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF0A0A0A),
       body: SafeArea(
-        child: Builder(
-          builder: (context) {
-            if (context.isMobile) {
-              return _buildMobileLayout(context, screenController);
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth > 1200) {
+              return _buildDesktopLayout(context);
+            } else if (constraints.maxWidth > 800) {
+              return _buildTabletLayout(context);
             } else {
-              return _buildDesktopLayout(context, screenController);
+              return _buildMobileLayout(context);
             }
           },
         ),
       ),
     );
   }
-}
 
-Widget _buildDesktopLayout(
-  BuildContext context,
-  CategoryScreenController screenController,
-) {
-  return Container(
-    constraints: const BoxConstraints(maxWidth: 1900),
-    padding: const EdgeInsets.all(24),
-    margin: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: const Color(0xFF171A3B),
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.25),
-          blurRadius: 10,
-          offset: const Offset(0, 5),
+  Widget _buildDesktopLayout(BuildContext context) {
+    return Row(
+      children: [
+        // Left Panel - Form
+        Expanded(
+          flex: 3,
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1A1A2E),
+                  Color(0xFF16213E),
+                  Color(0xFF0F0F23),
+                ],
+              ),
+            ),
+            child: _buildFormContent(context, isDesktop: true),
+          ),
+        ),
+        // Right Panel - Image Upload
+        Expanded(
+          flex: 2,
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [
+                  Color(0xFF16213E),
+                  Color(0xFF1A1A2E),
+                  Color(0xFF0F0F23),
+                ],
+              ),
+            ),
+            child: _buildImageSection(context),
+          ),
         ),
       ],
-    ),
-    child: SingleChildScrollView(
-      child: GetBuilder<CategoryScreenController>(
-        builder: (_) => Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+
+  Widget _buildTabletLayout(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF1A1A2E), Color(0xFF16213E), Color(0xFF0F0F23)],
+          ),
+        ),
+        child: Column(
           children: [
-            Row(
+            _buildFormContent(context, isTablet: true),
+            _buildImageSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileLayout(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF1A1A2E), Color(0xFF16213E), Color(0xFF0F0F23)],
+          ),
+        ),
+        child: Column(
+          children: [
+            _buildFormContent(context, isMobile: true),
+            _buildImageSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormContent(
+    BuildContext context, {
+    bool isDesktop = false,
+    bool isTablet = false,
+    bool isMobile = false,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(isDesktop ? 48 : (isTablet ? 32 : 24)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          _buildHeader(context),
+          SizedBox(height: isDesktop ? 48 : 32),
+
+          Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                InkWell(
-                  onTap: () => screenController.toggleChange(0),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(77),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(LucideIcons.arrowLeft, color: Colors.white),
-                  ),
+                _buildInputField(
+                  controller: categoryController.ctrname,
+                  label: 'Category Name',
+                  hint: 'Enter category name',
+                  icon: Icons.category_outlined,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter category name';
+                    }
+                    return null;
+                  },
                 ),
+                const SizedBox(height: 24),
 
-
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'Create Category',
-                      style: context.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ),
+                _buildInputField(
+                  controller: categoryController.ctrdescription,
+                  label: 'Description',
+                  hint: 'Enter category description',
+                  icon: Icons.description_outlined,
+                  maxLines: 4,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter category description';
+                    }
+                    return null;
+                  },
                 ),
-                const SizedBox(width: 40),
+                const SizedBox(height: 24),
+
+                // Status Toggle
+                _buildStatusToggle(),
+                SizedBox(height: isDesktop ? 48 : 32),
+
+                // Action Buttons
+                _buildActionButtons(context),
               ],
             ),
-            const SizedBox(height: 24),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Category Name'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final CategoryScreenController categoryScreenController = Get.find();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(12),
+              child: InkWell(
+                onTap: () => categoryScreenController.toggleChange(0),
+                child: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              categoryController.isEditing.value
+                  ? 'Update Category'
+                  : 'Create New Category',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          categoryController.isEditing.value
+              ? 'Update a product to orginze your product'
+              : 'Add a new category to organize your products',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.white.withValues(alpha: 0.7),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.05),
+                Colors.white.withValues(alpha: 0.02),
+              ],
+            ),
+          ),
+          child: TextFormField(
+            controller: controller,
+            maxLines: maxLines,
+            style: const TextStyle(color: Colors.black),
+            validator: validator,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+              prefixIcon: Icon(icon, color: const Color(0xFF6366F1)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.all(20),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusToggle() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.05),
+            Colors.white.withValues(alpha: 0.02),
+          ],
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.toggle_on_outlined, color: Color(0xFF6366F1)),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Category Status',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Set whether this category is active',
+                  style: TextStyle(fontSize: 14, color: Colors.white54),
+                ),
+              ],
+            ),
+          ),
+          Obx(
+            () => Switch(
+              value: categoryController.isActiveCategory.value,
+              onChanged: (value) =>
+                  categoryController.isActiveCategory.value = value,
+              activeColor: const Color(0xFF10B981),
+              activeTrackColor: const Color(0xFF10B981).withValues(alpha: 0.3),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 56,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            child: TextButton(
+              onPressed: () {
+                categoryController.clearForm(); // Clear form on cancel
+                final CategoryScreenController categoryScreenController =
+                    Get.find();
+                categoryScreenController.toggleChange(0);
+              },
+              style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white70,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 2,
+          child: Obx(
+            () => Container(
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed:
+                    (categoryController.isSaving.value ||
+                        categoryController.imageController.isUploading.value)
+                    ? null
+                    : _handleSubmit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: _buildButtonChild(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButtonChild() {
+    return Obx(() {
+      if (categoryController.imageController.isUploading.value) {
+        return const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Uploading...',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        );
+      } else if (categoryController.isSaving.value) {
+        return const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Creating...',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        );
+      } else {
+        return Text(
+          categoryController.isEditing.value
+              ? 'Update Category'
+              : 'Create Category',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        );
+      }
+    });
+  }
+
+  Widget _buildImageSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            categoryController.isEditing.value
+                ? 'Change New Image '
+                : 'Category Image',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Upload an image to represent this category',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white.withValues(alpha: 0.7),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Expanded(
+            child: Obx(() {
+              final imageController = categoryController.imageController;
+
+              final hasImages = kIsWeb
+                  ? imageController.imageBytesList.isNotEmpty
+                  : imageController.imageFiles.isNotEmpty;
+
+              if (imageController.isUploading.value) {
+                return _buildUploadingState();
+              } else if (hasImages) {
+                return _buildImagePreview();
+              } else {
+                return _buildImageUploadArea();
+              }
+            }),
+          ),
+          if (categoryController.isEditing.value)
+            Expanded(
+              child: Obx(() {
+                return categoryController.existingImageUrl.isNotEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Your old Image',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                padding: EdgeInsets.all(20),
+                                width: 250,
+                                height: 250,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: BoxBorder.all(
+                                    width: 2,
+                                    color: AppColors.borderColro.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                ),
+                                child: Image.network(
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                  categoryController.existingImageUrl.value,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox.shrink();
+              }),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUploadingState() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        color: Colors.black.withValues(alpha: 0.3),
+      ),
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Color(0xFF6366F1), strokeWidth: 3),
+          SizedBox(height: 16),
+          Text(
+            'Uploading image...',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageUploadArea() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.borderColro.withValues(alpha: 0.3),
+          width: 2,
+          style: BorderStyle.values[1],
+        ),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withValues(alpha: 0.05),
+            Colors.white.withValues(alpha: 0.02),
+          ],
+        ),
+      ),
+      child: InkWell(
+        onTap: categoryController.pickImage,
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF6366F1).withValues(alpha: 0.2),
+                    const Color(0xFF8B5CF6).withValues(alpha: 0.2),
+                  ],
+                ),
+              ),
+              child: const Icon(
+                Icons.cloud_upload_outlined,
+                size: 48,
+                color: Color(0xFF6366F1),
+              ),
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Save Category'),
+            const Text(
+              'Click to upload image',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Upload images in their original quality',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.white.withValues(alpha: 0.6),
               ),
             ),
           ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-// 3. ADDED: A placeholder layout for mobile.
-Widget _buildMobileLayout(
-  BuildContext context,
-  CategoryScreenController screenController,
-) {
-  return _buildDesktopLayout(context, screenController);
+  Widget _buildImagePreview() {
+    final imageController = categoryController.imageController;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Stack(
+        children: [
+          AspectRatio(
+            aspectRatio: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: kIsWeb
+                  ? Image.memory(
+                      imageController.imageBytesList.first,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      imageController.imageFiles.first,
+                      fit: BoxFit.cover,
+                    ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 8,
+            left: 8,
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                await categoryController.pickImage();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black.withValues(alpha: 0.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.image, size: 18, color: Colors.white),
+              label: const Text(
+                "Change",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+
+          // ✅ Remove image button
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                imageController.clearSelection();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.withValues(alpha: 0.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.delete, size: 18, color: Colors.white),
+              label: const Text(
+                "Remove",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      if (categoryController.isEditing.value) {
+        await categoryController.updateCategory();
+      } else {
+        await categoryController.createCategory();
+      }
+    }
+  }
 }

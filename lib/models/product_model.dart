@@ -1,4 +1,4 @@
-import 'package:dashboard_admin/models/category_model.dart';
+import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 
 class ProductModel {
   final String? id;
@@ -8,7 +8,7 @@ class ProductModel {
   final List<String>? imageUrls;
   final int? stock;
   final String? brand;
-  final CategoryModel? category;
+  final Category? category;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -38,7 +38,7 @@ class ProductModel {
       stock: (json['stock'] as num?)?.toInt(),
       brand: json['brand'] as String?,
       category: json['categoryId'] != null
-          ? CategoryModel.fromJson(json['categoryId'])
+          ? Category.fromJson(json['categoryId'])
           : null,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])

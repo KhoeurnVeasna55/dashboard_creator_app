@@ -1,20 +1,28 @@
+import 'dart:developer';
 import 'package:dashboard_admin/core/utils/app_colors.dart';
 import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
+import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 /// ---------------------------
-/// DataTableSource that listens to GetX and safely calls notifyListeners()
+/// Fixed CategoryTableSource with proper pagination handling
 /// ---------------------------
 class CategoryTableSource extends DataTableSource {
   CategoryTableSource(this.controller) {
-    // listen to controller changes and refresh the table
-    _wItems = ever<List<Category>>(controller.items, (_) => notifyListeners());
-    _wTotal = ever<int>(controller.total, (_) => notifyListeners());
-    _wSelected =
-        ever<Set<String>>(controller.selected, (_) => notifyListeners());
+    _wItems = ever<List<Category>>(controller.items, (items) {
+      // log('📊 Items changed: ${items.length} items');
+      notifyListeners();
+    });
+    _wTotal = ever<int>(controller.total, (total) {
+      // log('📊 Total changed: $total');
+      notifyListeners();
+    });
+    _wSelected = ever<Set<String>>(controller.selected, (selected) {
+      notifyListeners();
+    });
   }
 
   final CategoryController controller;
@@ -23,6 +31,7 @@ class CategoryTableSource extends DataTableSource {
   late final Worker _wItems;
   late final Worker _wTotal;
   late final Worker _wSelected;
+
   @override
   void dispose() {
     super.dispose();
@@ -52,86 +61,122 @@ class CategoryTableSource extends DataTableSource {
 
   @override
   DataRow? getRow(int index) {
-    if (controller.total.value == 0) return null;
+    final currentPage = controller.page.value;
+    final itemsPerPage = controller.limit.value;
+    final startIndex = (currentPage - 1) * itemsPerPage;
+    final localIndex = index - startIndex;
 
-    if (index < 0 || index >= controller.items.length) {
-      return const DataRow(cells: [
-        DataCell(Text('—')),
-        DataCell(Text('—')),
-        DataCell(Text('—')),
-        DataCell(Text('—')),
-        DataCell(Text('—')),
-        DataCell(Text('—')),
-      ]);
+    // log(
+    //   '🔍 getRow: global=$index, currentPage=$currentPage, startIndex=$startIndex, localIndex=$localIndex',
+    // );
+    // log('🔍 Items available: ${controller.items.length}');
+
+    // Check if this index belongs to current page
+    if (localIndex < 0 || localIndex >= controller.items.length) {
+      log('❌ Index $localIndex out of bounds or not in current page');
+      return null;
     }
 
-    final c = controller.items[index];
+    // Check if we have data for this index
+    if (controller.items.isEmpty) {
+      log('❌ No items available');
+      return null;
+    }
+
+    final c = controller.items[localIndex];
+    // log('✅ Rendering row: ${c.name} (localIndex: $localIndex)');
 
     return DataRow.byIndex(
       index: index,
       selected: controller.selected.contains(c.id),
-      onSelectChanged: (v) => controller.toggleSelect(c.id, v ?? false),
+      onSelectChanged: (v) {
+        controller.toggleSelect(c.id, v ?? false);
+      },
       cells: [
-        // Name (with optional thumb)
-        DataCell(Row(
-          children: [
-            if (c.imageUrl != null && c.imageUrl!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.network(
-                    c.imageUrl!,
-                    height: 24,
-                    width: 24,
-                    fit: BoxFit.cover,
+        DataCell(
+          Row(
+            children: [
+              if (c.imageUrl != null && c.imageUrl!.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.network(
+                      c.imageUrl!,
+                      height: 24,
+                      width: 24,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 24,
+                          height: 24,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            size: 12,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
+              Flexible(
+                child: Text(
+                  c.name,
+                  style: const TextStyle(color: AppColors.text),
+                ),
               ),
-            Flexible(
-              child: Text(
-                c.name,
-                style: const TextStyle(color: AppColors.text),
-              ),
-            ),
-          ],
-        )),
+            ],
+          ),
+        ),
         DataCell(
           Text(c.slug, style: const TextStyle(color: AppColors.textMuted)),
         ),
         DataCell(_statusPill(c.isActive)),
-        DataCell(Text(_fmt.format(c.createdAt))),
+        DataCell(
+          Text(
+            // ignore: unnecessary_null_comparison
+            c.createdAt != null ? _fmt.format(c.createdAt) : '—',
+            style: const TextStyle(color: AppColors.text),
+          ),
+        ),
         DataCell(
           Text(
             c.description ?? '—',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: AppColors.text),
           ),
         ),
-        // Actions
-        DataCell(Row(
-          children: [
-            IconButton(
-              tooltip: c.isActive ? 'Deactivate' : 'Activate',
-              icon: Icon(
-                c.isActive
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                size: 20,
-                color: AppColors.icon,
+        DataCell(
+          Row(
+            children: [
+              IconButton(
+                tooltip: (c.isActive) ? 'Deactivate' : 'Activate',
+                icon: Icon(
+                  (c.isActive)
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  size: 20,
+                  color: AppColors.icon,
+                ),
+                onPressed: () => controller.toggleStatus(c),
               ),
-              onPressed: () => controller.toggleStatus(c),
-            ),
-            IconButton(
-              tooltip: 'Edit',
-              icon: const Icon(Icons.edit_outlined,
-                  size: 20, color: AppColors.icon),
-              onPressed: () {
-                // hook up your edit here if needed
-              },
-            ),
-          ],
-        )),
+              IconButton(
+                tooltip: 'Edit',
+                icon: const Icon(
+                  Icons.edit_outlined,
+                  size: 20,
+                  color: AppColors.icon,
+                ),
+                onPressed: () {
+                  controller.loadCategoryForEdit(c);
+                  Get.find<CategoryScreenController>().toggleChange(1);
+                },
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

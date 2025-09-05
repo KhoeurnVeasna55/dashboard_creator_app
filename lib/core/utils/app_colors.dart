@@ -9,6 +9,7 @@ class AppColors {
   static const border = Color(0xFFE5E7EB); // subtle border
   static const text = Color(0xFF111827); // gray-900
   static const textMuted = Color(0xFF6B7280); // gray-500
+  static const borderColro = Color(0xFF6366F1);
 
   // Status colors (custom HEX, not Material constants)
   static const activeText = Color(0xFF065F46); // emerald-800

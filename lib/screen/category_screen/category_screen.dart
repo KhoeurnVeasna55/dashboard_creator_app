@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:dashboard_admin/core/utils/app_colors.dart';
 import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
-import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:dashboard_admin/widgets/category_table_source.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,14 +25,14 @@ class _CategoryPageState extends State<CategoryPage> {
   void initState() {
     super.initState();
     final ctrl = Get.find<CategoryController>();
-    _source = CategoryTableSource(ctrl); // listens internally; safe to notify
-    _searchCtrl.addListener(() => setState(() {})); // update suffix icon
+    _source = CategoryTableSource(ctrl);
+    _searchCtrl.addListener(() => setState(() {}));
     ctrl.load();
   }
 
   @override
   void dispose() {
-    _source.dispose(); // <-- important: dispose workers inside source
+    _source.dispose();
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -55,11 +56,10 @@ class _CategoryPageState extends State<CategoryPage> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       appBar: AppBar(
-        title: const Text('Categories'),
-        backgroundColor: Colors.black,
+        title: Text('Categories', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0D0F2B),
         foregroundColor: Colors.white,
         actions: [
-          // --- NEW: Create button in header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: FilledButton.icon(
@@ -85,7 +85,6 @@ class _CategoryPageState extends State<CategoryPage> {
             SingleChildScrollView(
               child: Column(
                 children: [
-                  // Toolbar (Search + Filter + Bulk Delete)
                   Container(
                     margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     padding: const EdgeInsets.all(12),
@@ -95,7 +94,7 @@ class _CategoryPageState extends State<CategoryPage> {
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -147,7 +146,6 @@ class _CategoryPageState extends State<CategoryPage> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        // Status Filter
                         DropdownButton<bool?>(
                           value: ctrl.isActive.value,
                           underline: const SizedBox(),
@@ -165,7 +163,6 @@ class _CategoryPageState extends State<CategoryPage> {
                           onChanged: ctrl.setIsActiveFilter,
                         ),
                         const Spacer(),
-                        // --- CHANGED: Bulk Delete only
                         Obx(() {
                           final count = ctrl.selected.length;
                           final hasSel = count > 0;
@@ -227,7 +224,6 @@ class _CategoryPageState extends State<CategoryPage> {
 
                   // The table
                   Theme(
-                    // Local theme JUST for this table + paginator
                     data: Theme.of(context).copyWith(
                       cardColor: AppColors.surface,
                       canvasColor: AppColors.surface,
@@ -249,7 +245,7 @@ class _CategoryPageState extends State<CategoryPage> {
                             AppColors.icon,
                           ),
                           overlayColor: WidgetStateProperty.all(
-                            Colors.black.withOpacity(.05),
+                            Colors.black.withValues(alpha: .05),
                           ),
                         ),
                       ),
@@ -346,9 +342,16 @@ class _CategoryPageState extends State<CategoryPage> {
                       source: _source,
                       sortColumnIndex: _sortColumnIndex,
                       sortAscending: _sortAscending,
+
                       onPageChanged: (startIndex) {
                         final newPage = (startIndex ~/ ctrl.limit.value) + 1;
-                        ctrl.load(toPage: newPage);
+                        log(
+                          "startIndex=$startIndex → newPage=$newPage, currentPage=${ctrl.page.value}",
+                        );
+
+                        if (newPage != ctrl.page.value) {
+                          ctrl.load(toPage: newPage);
+                        }
                       },
                       rowsPerPage: ctrl.limit.value,
                       onRowsPerPageChanged: (v) =>
@@ -364,7 +367,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
             if (ctrl.loading.isTrue)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 child: const Center(
                   child: CircularProgressIndicator.adaptive(),
                 ),
