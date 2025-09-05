@@ -1,6 +1,5 @@
 import 'package:dashboard_admin/core/utils/app_colors.dart';
 import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
-import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:dashboard_admin/widgets/category_table_source.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
