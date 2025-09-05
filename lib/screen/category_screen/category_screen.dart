@@ -1,4 +1,5 @@
 import 'package:dashboard_admin/core/utils/app_colors.dart';
+import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
 import 'package:dashboard_admin/widgets/category_table_source.dart';
 import 'package:flutter/material.dart';
@@ -23,14 +24,14 @@ class _CategoryPageState extends State<CategoryPage> {
   void initState() {
     super.initState();
     final ctrl = Get.find<CategoryController>();
-    _source = CategoryTableSource(ctrl); // listens internally; safe to notify
-    _searchCtrl.addListener(() => setState(() {})); // update suffix icon
+    _source = CategoryTableSource(ctrl); 
+    _searchCtrl.addListener(() => setState(() {})); 
     ctrl.load();
   }
 
   @override
   void dispose() {
-    _source.dispose(); // <-- important: dispose workers inside source
+    _source.dispose(); 
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -58,13 +59,12 @@ class _CategoryPageState extends State<CategoryPage> {
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         actions: [
-          // --- NEW: Create button in header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: FilledButton.icon(
               icon: const Icon(Icons.add),
               label: const Text('Create'),
-              onPressed: () => ctrl.create(),
+              onPressed: () => Get.find<CategoryScreenController>().goAdd(),
               style: FilledButton.styleFrom(foregroundColor: Colors.white),
             ),
           ),

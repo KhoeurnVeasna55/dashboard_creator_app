@@ -5,8 +5,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:dashboard_admin/core/URL/url.dart';
 import 'package:dashboard_admin/core/utils/custom_toast_noti.dart';
-import 'package:dashboard_admin/models/category_model.dart';
 import 'package:dashboard_admin/models/product_model.dart';
+import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:dashboard_admin/services/product_service.dart';
 import 'package:dashboard_admin/screen/products-screen/create_prdouct_screen.dart';
 import 'package:dashboard_admin/screen/products-screen/product_page.dart';
@@ -24,7 +24,7 @@ class ProductController extends GetxController {
   final pickedImageFiles = <File>[].obs;
   final pickedImageBytesList = <Uint8List>[].obs;
   final pickedImageNames = <String>[].obs;
-  final selectedCategory = Rx<CategoryModel?>(null);
+  final selectedCategory = Rx<Category?>(null);
   final isCreatingProduct = false.obs;
 
   final RxInt currentIndex = 0.obs;
@@ -228,7 +228,7 @@ class ProductController extends GetxController {
       request.fields['description'] = descriptionController.text;
       request.fields['price'] = price.toString();
       request.fields['moreDetails'] = moreDetailsController.text;
-      request.fields['categoryId'] = selectedCategory.value!.id!;
+      request.fields['categoryId'] = selectedCategory.value!.id;
       request.fields['brand'] = brandController.text;
       request.fields['stock'] = stock.toString();
 
@@ -351,7 +351,7 @@ class ProductController extends GetxController {
       request.fields['price'] = priceController.text;
       request.fields['stock'] = stockController.text;
       request.fields['brand'] = brandController.text;
-      request.fields['categoryId'] = selectedCategory.value!.id!;
+      request.fields['categoryId'] = selectedCategory.value!.id;
 
       // ✅ Send existing images that should be kept
       if (existingImageUrls.isNotEmpty) {

@@ -1,5 +1,6 @@
 import 'package:dashboard_admin/controllers/auth_controller.dart';
 import 'package:dashboard_admin/controllers/product_controller.dart';
+import 'package:dashboard_admin/screen/banner_screen/controller/banner_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
 import 'package:flutter/material.dart';
@@ -13,5 +14,6 @@ class Binding extends Bindings {
     Get.lazyPut(() => ProductController());
     Get.lazyPut(() => CategoryController());
     Get.lazyPut(() => CategoryScreenController());
+    Get.lazyPut(() => BannerController());
   }
 }

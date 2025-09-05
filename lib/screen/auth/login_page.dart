@@ -25,8 +25,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _emailController.text = dotenv.env["FLUTTER_ENV"] == "production"? "": "veasna125@example.com";
-    _passwordController.text = dotenv.env["FLUTTER_ENV"] == "production"? "": "Qrad12@";
+    _emailController.text = dotenv.env["FLUTTER_ENV"] == "development"? "": "veasna125@example.com";
+    _passwordController.text = dotenv.env["FLUTTER_ENV"] == "development"? "": "Qrad12@";
   }
 
   @override
