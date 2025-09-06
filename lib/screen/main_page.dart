@@ -1,5 +1,6 @@
 // main_page.dart
 import 'package:dashboard_admin/core/routes/router_utils.dart';
+import 'package:dashboard_admin/screen/banner_screen/screen/main_banner_screen.dart';
 import 'package:dashboard_admin/screen/category_screen/main_category.dart';
 import 'package:dashboard_admin/screen/home_ds.dart';
 import 'package:dashboard_admin/screen/products-screen/main_product_screen.dart';
@@ -142,6 +143,9 @@ class _MainPageState extends State<MainPage> {
                       return MainProductScreen();
                     case 2:
                       return const MainCategory();
+
+                    case 3:
+                      return MainBannerScreen();
                     default:
                       return const Center(child: Text('Page not found'));
                   }
@@ -247,6 +251,10 @@ class ExampleSidebarX extends StatelessWidget {
           label: 'Category',
           onTap: () => Future.microtask(() => _controller.selectIndex(2)),
         ),
+        SidebarXItem(
+          icon: LucideIcons.image,
+          label: 'Banner',
+        )
       ],
     );
   }
@@ -260,6 +268,9 @@ String getTitleByIndex(int index) {
       return 'Products';
     case 2:
       return 'Categories';
+
+    case 3:
+      return 'Banner';
     default:
       return 'Not found page';
   }

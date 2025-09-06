@@ -12,19 +12,27 @@ class BannerServiceApi {
   Future<PaginatedBanner> fetchBanners({
     required int page,
     required int limit,
+    String? title , 
+    String? subtitle,
     String? search,
     bool? isActive,
+    DateTime? startDate,
+    DateTime? endDate,
     String sortBy = 'createdAt',
     bool ascending = false,
+    int? position ,
   }) async {
     final uri = Uri.parse('$URL/api/banners').replace(
       queryParameters: {
+        'title': title,
+        'subtitle': subtitle,
         'page': page.toString(),
         'limit': limit.toString(),
         if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
         if (isActive != null) 'isActive': isActive.toString(),
         'sortBy': sortBy,
         'order': ascending ? 'asc' : 'desc',
+        'position': position ,
       },
     );
 
