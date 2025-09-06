@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:dashboard_admin/core/utils/header_util.dart';
 import 'package:dashboard_admin/models/image_model.dart';
 import 'package:dashboard_admin/services/store_token.dart';
@@ -14,14 +13,12 @@ import '../core/URL/url.dart';
 class UploadService {
   UploadService._();
 
-  // --- 🚀 CHANGE 1: DEFINED CONSTANTS FOR KEYS AND ENDPOINTS ---
   static const String _singleUploadEndpoint = '/api/uploads';
   static const String _multipleUploadEndpoint = '/api/uploads/many';
   static const String _fileFieldKey = 'file';
   static const String _filesFieldKey = 'files';
   static const String _folderFieldKey = 'folder';
 
-  /// Uploads a single image.
   static Future<CloudinaryResponse?> uploadSingleImage({
     File? imageFile,
     Uint8List? imageBytes,

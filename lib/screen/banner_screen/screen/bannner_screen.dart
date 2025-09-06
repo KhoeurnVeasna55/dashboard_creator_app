@@ -1,13 +1,58 @@
+import 'dart:developer';
+
 import 'package:dashboard_admin/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class BannnerScreen extends StatelessWidget {
+import '../../../widgets/category_table_source.dart';
+import '../../category_screen/controller/category_controller.dart';
+
+class BannnerScreen extends StatefulWidget {
   const BannnerScreen({super.key});
 
   @override
+  State<BannnerScreen> createState() => _BannnerScreenState();
+}
+
+class _BannnerScreenState extends State<BannnerScreen> {
+  late final CategoryTableSource _source;
+  final _searchCtrl = TextEditingController();
+  int? _sortColumnIndex;
+  bool _sortAscending = false;
+  @override
+  void initState() {
+    super.initState();
+    final ctrl = Get.find<CategoryController>();
+    _source = CategoryTableSource(ctrl);
+    _searchCtrl.addListener(() => setState(() {}));
+    ctrl.load();
+  }
+
+  @override
+  void dispose() {
+    _source.dispose();
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  void _applySort(String field, int columnIndex) {
+    setState(() {
+      if (_sortColumnIndex == columnIndex) {
+        _sortAscending = !_sortAscending;
+      } else {
+        _sortColumnIndex = columnIndex;
+        _sortAscending = false;
+      }
+    });
+    Get.find<CategoryController>().setSort(field, _sortAscending);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final ctrl = Get.find<CategoryController>();
+
     return Scaffold(
-            backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.bg,
       appBar: AppBar(
         title: Text('Banner', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF0D0F2B),
@@ -24,6 +69,310 @@ class BannnerScreen extends StatelessWidget {
           ),
         ],
       ),
+      body: Obx(() {
+        if (ctrl.error.value != null) {
+          return Center(
+            child: Text(
+              'Error: ${ctrl.error.value}',
+              style: const TextStyle(color: AppColors.text),
+            ),
+          );
+        }
+        return Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.border),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        // Search
+                        SizedBox(
+                          width: 320,
+                          child: TextField(
+                            controller: _searchCtrl,
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (q) => ctrl.setSearch(q),
+                            decoration: InputDecoration(
+                              hintText: 'Search name/description',
+                              prefixIcon: const Icon(
+                                Icons.search,
+                                color: AppColors.iconMuted,
+                              ),
+                              suffixIcon: (_searchCtrl.text.isNotEmpty)
+                                  ? IconButton(
+                                      icon: const Icon(
+                                        Icons.clear,
+                                        color: AppColors.iconMuted,
+                                      ),
+                                      onPressed: () {
+                                        _searchCtrl.clear();
+                                        ctrl.setSearch('');
+                                      },
+                                    )
+                                  : null,
+                              isDense: true,
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: AppColors.border,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: AppColors.border,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        DropdownButton<bool?>(
+                          value: ctrl.isActive.value,
+                          underline: const SizedBox(),
+                          items: const [
+                            DropdownMenuItem(value: null, child: Text('All')),
+                            DropdownMenuItem(
+                              value: true,
+                              child: Text('Active'),
+                            ),
+                            DropdownMenuItem(
+                              value: false,
+                              child: Text('Inactive'),
+                            ),
+                          ],
+                          onChanged: ctrl.setIsActiveFilter,
+                        ),
+                        const Spacer(),
+                        Obx(() {
+                          final count = ctrl.selected.length;
+                          final hasSel = count > 0;
+                          return Row(
+                            children: [
+                              Text(
+                                'Selected: $count',
+                                style: const TextStyle(
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              FilledButton.icon(
+                                onPressed: hasSel
+                                    ? () async {
+                                        final confirmed = await showDialog<bool>(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: const Text(
+                                              'Delete selected',
+                                            ),
+                                            content: Text(
+                                              'Are you sure you want to delete $count selected item(s)? This cannot be undone.',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx, false),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              FilledButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(ctx, true),
+                                                child: const Text('Delete'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        if (confirmed == true) {
+                                          await ctrl.bulkDelete();
+                                        }
+                                      }
+                                    : null,
+                                icon: const Icon(Icons.delete),
+                                label: const Text('Delete'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.red.shade600,
+                                  foregroundColor: Colors.white,
+                                  disabledBackgroundColor: Colors.red.shade200,
+                                  disabledForegroundColor: Colors.white70,
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+
+                  // The table
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      cardColor: AppColors.surface,
+                      canvasColor: AppColors.surface,
+                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                        surface: AppColors.surface,
+                        onSurface: AppColors.text,
+                        surfaceContainerHighest: AppColors.surface,
+                        surfaceContainerHigh: AppColors.surface,
+                        surfaceContainer: AppColors.surface,
+                      ),
+                      dividerTheme: const DividerThemeData(
+                        color: AppColors.border,
+                        thickness: 0.6,
+                        space: 0.6,
+                      ),
+                      iconButtonTheme: IconButtonThemeData(
+                        style: ButtonStyle(
+                          foregroundColor: WidgetStateProperty.all(
+                            AppColors.icon,
+                          ),
+                          overlayColor: WidgetStateProperty.all(
+                            Colors.black.withValues(alpha: .05),
+                          ),
+                        ),
+                      ),
+                      dropdownMenuTheme: const DropdownMenuThemeData(
+                        textStyle: TextStyle(color: AppColors.text),
+                        menuStyle: MenuStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            AppColors.surface,
+                          ),
+                          surfaceTintColor: WidgetStatePropertyAll(
+                            Colors.transparent,
+                          ),
+                          elevation: WidgetStatePropertyAll(2),
+                        ),
+                      ),
+                      textTheme: Theme.of(context).textTheme.copyWith(
+                        bodyMedium: const TextStyle(color: AppColors.text),
+                        titleMedium: const TextStyle(color: AppColors.text),
+                      ),
+                      dataTableTheme: DataTableThemeData(
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          border: Border.all(color: AppColors.border),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        headingRowColor: WidgetStateProperty.all(
+                          AppColors.surface,
+                        ),
+                        headingTextStyle: const TextStyle(
+                          color: AppColors.text,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        dataRowColor: WidgetStateProperty.resolveWith<Color?>((
+                          states,
+                        ) {
+                          if (states.contains(WidgetState.selected)) {
+                            return const Color(0xFFF0F2F5);
+                          }
+                          return AppColors.surface;
+                        }),
+                        dividerThickness: 0.6,
+                      ),
+                    ),
+                    child: PaginatedDataTable(
+                      header: Text(
+                        ctrl.search.value.isEmpty
+                            ? 'All Categories'
+                            : 'Filtered (query: "${ctrl.search.value}")',
+                        style: const TextStyle(color: AppColors.text),
+                      ),
+                      onSelectAll: (v) => ctrl.selectAllOnPage(v ?? false),
+
+                      columns: [
+                        DataColumn(
+                          label: const Text(
+                            'Name',
+                            style: TextStyle(color: AppColors.text),
+                          ),
+                          onSort: (_, __) => _applySort('name', 0),
+                        ),
+                        const DataColumn(
+                          label: Text(
+                            'Slug',
+                            style: TextStyle(color: AppColors.text),
+                          ),
+                        ),
+                        DataColumn(
+                          label: const Text(
+                            'Status',
+                            style: TextStyle(color: AppColors.text),
+                          ),
+                          onSort: (_, __) => _applySort('isActive', 2),
+                        ),
+                        DataColumn(
+                          label: const Text(
+                            'Created',
+                            style: TextStyle(color: AppColors.text),
+                          ),
+                          onSort: (_, __) => _applySort('createdAt', 3),
+                        ),
+                        const DataColumn(
+                          label: Text(
+                            'Description',
+                            style: TextStyle(color: AppColors.text),
+                          ),
+                        ),
+                        const DataColumn(
+                          label: Text(
+                            'Actions',
+                            style: TextStyle(color: AppColors.text),
+                          ),
+                        ),
+                      ],
+                      source: _source,
+                      sortColumnIndex: _sortColumnIndex,
+                      sortAscending: _sortAscending,
+
+                      onPageChanged: (startIndex) {
+                        final newPage = (startIndex ~/ ctrl.limit.value) + 1;
+                        log(
+                          "startIndex=$startIndex → newPage=$newPage, currentPage=${ctrl.page.value}",
+                        );
+
+                        if (newPage != ctrl.page.value) {
+                          ctrl.load(toPage: newPage);
+                        }
+                      },
+                      rowsPerPage: ctrl.limit.value,
+                      onRowsPerPageChanged: (v) =>
+                          v != null ? ctrl.setRowsPerPage(v) : null,
+                      availableRowsPerPage: const [5, 10, 15, 20, 25, 50, 100],
+                      showFirstLastButtons: true,
+                      dividerThickness: 0.6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            if (ctrl.loading.isTrue)
+              Container(
+                color: Colors.black.withValues(alpha: 0.5),
+                child: const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+              ),
+          ],
+        );
+      }),
     );
   }
 }

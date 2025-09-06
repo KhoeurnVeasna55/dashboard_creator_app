@@ -25,8 +25,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _emailController.text = dotenv.env["FLUTTER_ENV"] == "development"? "": "veasna125@example.com";
-    _passwordController.text = dotenv.env["FLUTTER_ENV"] == "development"? "": "Qrad12@";
+    _emailController.text = dotenv.env["FLUTTER_ENV"] == "development"
+        ? "veasna125@example.com"
+        : "";
+    _passwordController.text = dotenv.env["FLUTTER_ENV"] == "development"
+        ? "Qrad12@"
+        : "";
   }
 
   @override
@@ -40,8 +44,8 @@ class _LoginPageState extends State<LoginPage> {
     // Nice responsive widths
     final w = c.maxWidth;
     if (w >= 1200) return 480; // desktop
-    if (w >= 800) return 440;  // tablet / small desktop
-    return 420;                // mobile
+    if (w >= 800) return 440; // tablet / small desktop
+    return 420; // mobile
   }
 
   Future<void> _handleLogin() async {
@@ -57,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
         Get.put(SidebarXController(selectedIndex: 0));
       }
       // Prefer using a builder with Get.offAll
-      Get.offAll(() =>  MainPage());
+      Get.offAll(() => MainPage());
     }
   }
 
@@ -73,8 +77,12 @@ class _LoginPageState extends State<LoginPage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                theme.colorScheme.primaryContainer.withOpacity(kIsWeb ? 0.5 : 0.2),
-                theme.colorScheme.surfaceContainerHighest.withOpacity(kIsWeb ? 0.5 : 0.2),
+                theme.colorScheme.primaryContainer.withValues(
+                  alpha: kIsWeb ? 0.5 : 0.2,
+                ),
+                theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: kIsWeb ? 0.5 : 0.2,
+                ),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -86,7 +94,10 @@ class _LoginPageState extends State<LoginPage> {
                 final cardMaxWidth = _cardMaxWidth(constraints);
                 return Center(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 24,
+                    ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: cardMaxWidth,
@@ -100,7 +111,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 250),
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 28,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             color: theme.colorScheme.surface,
@@ -117,15 +131,20 @@ class _LoginPageState extends State<LoginPage> {
                                   children: [
                                     CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
-                                      child: Icon(Icons.dashboard, color: theme.colorScheme.primary),
+                                      backgroundColor: theme.colorScheme.primary
+                                          .withValues(alpha: 0.12),
+                                      child: Icon(
+                                        Icons.dashboard,
+                                        color: theme.colorScheme.primary,
+                                      ),
                                     ),
                                     const SizedBox(width: 12),
                                     Text(
                                       'Dashboard Admin',
-                                      style: theme.textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: theme.textTheme.titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -133,16 +152,16 @@ class _LoginPageState extends State<LoginPage> {
                                 Text(
                                   'Login',
                                   textAlign: TextAlign.center,
-                                  style: theme.textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                  style: theme.textTheme.headlineSmall
+                                      ?.copyWith(fontWeight: FontWeight.w800),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   'Welcome back! Please sign in to continue.',
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                                    color: theme.textTheme.bodyMedium?.color
+                                        ?.withValues(alpha: 0.7),
                                   ),
                                 ),
                                 const SizedBox(height: 28),
@@ -150,7 +169,10 @@ class _LoginPageState extends State<LoginPage> {
                                 // Email
                                 TextFormField(
                                   controller: _emailController,
-                                  autofillHints: const [AutofillHints.username, AutofillHints.email],
+                                  autofillHints: const [
+                                    AutofillHints.username,
+                                    AutofillHints.email,
+                                  ],
                                   decoration: const InputDecoration(
                                     labelText: 'Email',
                                     prefixIcon: Icon(Icons.alternate_email),
@@ -161,7 +183,9 @@ class _LoginPageState extends State<LoginPage> {
                                     if (value == null || value.trim().isEmpty) {
                                       return 'Please enter your email';
                                     }
-                                    final emailReg = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+                                    final emailReg = RegExp(
+                                      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                                    );
                                     if (!emailReg.hasMatch(value.trim())) {
                                       return 'Please enter a valid email';
                                     }
@@ -179,9 +203,16 @@ class _LoginPageState extends State<LoginPage> {
                                     prefixIcon: const Icon(Icons.lock_outline),
                                     border: const OutlineInputBorder(),
                                     suffixIcon: IconButton(
-                                      tooltip: _obscure ? 'Show password' : 'Hide password',
-                                      onPressed: () => setState(() => _obscure = !_obscure),
-                                      icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
+                                      tooltip: _obscure
+                                          ? 'Show password'
+                                          : 'Hide password',
+                                      onPressed: () =>
+                                          setState(() => _obscure = !_obscure),
+                                      icon: Icon(
+                                        _obscure
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
                                     ),
                                   ),
                                   obscureText: _obscure,
@@ -202,9 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
-                                    onPressed: () {
-                                      // TODO: implement forgot password flow
-                                    },
+                                    onPressed: () {},
                                     child: const Text('Forgot password?'),
                                   ),
                                 ),
@@ -212,37 +241,44 @@ class _LoginPageState extends State<LoginPage> {
                                 const SizedBox(height: 8),
 
                                 // Login button + loading
-                                Obx(
-                                  () {
-                                    final isLoading = _authController.isLoading.value;
-                                    return FilledButton.tonal(
-                                      onPressed: isLoading ? null : _handleLogin,
-                                      style: FilledButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(vertical: 14),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(14),
-                                        ),
+                                Obx(() {
+                                  final isLoading =
+                                      _authController.isLoading.value;
+                                  return FilledButton.tonal(
+                                    onPressed: isLoading ? null : _handleLogin,
+                                    style: FilledButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 14,
                                       ),
-                                      child: AnimatedSize(
-                                        duration: const Duration(milliseconds: 200),
-                                        child: isLoading
-                                            ? Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: const [
-                                                  SizedBox(
-                                                    height: 20,
-                                                    width: 20,
-                                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                                  ),
-                                                  SizedBox(width: 12),
-                                                  Text('Signing in...'),
-                                                ],
-                                              )
-                                            : const Text('Login'),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
                                       ),
-                                    );
-                                  },
-                                ),
+                                    ),
+                                    child: AnimatedSize(
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
+                                      child: isLoading
+                                          ? Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: const [
+                                                SizedBox(
+                                                  height: 20,
+                                                  width: 20,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                      ),
+                                                ),
+                                                SizedBox(width: 12),
+                                                Text('Signing in...'),
+                                              ],
+                                            )
+                                          : const Text('Login'),
+                                    ),
+                                  );
+                                }),
 
                                 const SizedBox(height: 16),
 

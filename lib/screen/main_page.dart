@@ -148,6 +148,7 @@ class ExampleSidebarX extends StatelessWidget {
         ),
         const SidebarXItem(icon: LucideIcons.shoppingBag100, label: 'Products'),
         const SidebarXItem(icon: LucideIcons.creditCard, label: 'Category'),
+        const SidebarXItem(icon: LucideIcons.image, label: 'Banner'),
         SidebarXItem(
           icon: LucideIcons.heart,
           label: 'Favorites',

@@ -16,6 +16,7 @@ class BannerServiceApi {
     bool? isActive,
     String sortBy = 'createdAt',
     bool ascending = false,
+    int? position,
   }) async {
     final uri = Uri.parse('$URL/api/banners').replace(
       queryParameters: {
@@ -25,6 +26,7 @@ class BannerServiceApi {
         if (isActive != null) 'isActive': isActive.toString(),
         'sortBy': sortBy,
         'order': ascending ? 'asc' : 'desc',
+        'position': position,
       },
     );
 

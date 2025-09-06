@@ -9,13 +9,10 @@ class MainBannerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final BannerController _banner = Get.find();
+    final BannerController banner = Get.find();
     return IndexedStack(
-      index: _banner.currentScreen.value,
-      children: [
-        BannnerScreen(),
-        AtivityBannerScreen()
-      ],
+      index: banner.currentScreen.value,
+      children: [BannnerScreen(), AtivityBannerScreen()],
     );
   }
 }
