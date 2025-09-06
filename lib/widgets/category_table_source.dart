@@ -1,44 +1,25 @@
 import 'dart:developer';
 import 'package:dashboard_admin/core/utils/app_colors.dart';
-import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
-import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/models/category_model.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-/// ---------------------------
-/// Fixed CategoryTableSource with proper pagination handling
-/// ---------------------------
 class CategoryTableSource extends DataTableSource {
-  CategoryTableSource(this.controller) {
-    _wItems = ever<List<Category>>(controller.items, (items) {
-      // log('📊 Items changed: ${items.length} items');
-      notifyListeners();
-    });
-    _wTotal = ever<int>(controller.total, (total) {
-      // log('📊 Total changed: $total');
-      notifyListeners();
-    });
-    _wSelected = ever<Set<String>>(controller.selected, (selected) {
-      notifyListeners();
-    });
-  }
+  CategoryTableSource({
+    required this.items,
+    this.selectedIds = const <String>{},
+    this.onToggleSelect,
+    this.onToggleStatus,
+    this.onEdit,
+  });
 
-  final CategoryController controller;
+  final List<Category> items;
+  final Set<String> selectedIds;
+  final Function(String id, bool selected)? onToggleSelect;
+  final Function(Category category)? onToggleStatus;
+  final Function(Category category)? onEdit;
+
   final _fmt = DateFormat('yyyy-MM-dd');
-
-  late final Worker _wItems;
-  late final Worker _wTotal;
-  late final Worker _wSelected;
-
-  @override
-  void dispose() {
-    super.dispose();
-    _wItems.dispose();
-    _wTotal.dispose();
-    _wSelected.dispose();
-  }
 
   Widget _statusPill(bool active) {
     return Container(
@@ -61,36 +42,24 @@ class CategoryTableSource extends DataTableSource {
 
   @override
   DataRow? getRow(int index) {
-    final currentPage = controller.page.value;
-    final itemsPerPage = controller.limit.value;
-    final startIndex = (currentPage - 1) * itemsPerPage;
-    final localIndex = index - startIndex;
-
-    // log(
-    //   '🔍 getRow: global=$index, currentPage=$currentPage, startIndex=$startIndex, localIndex=$localIndex',
-    // );
-    // log('🔍 Items available: ${controller.items.length}');
-
-    // Check if this index belongs to current page
-    if (localIndex < 0 || localIndex >= controller.items.length) {
-      log('❌ Index $localIndex out of bounds or not in current page');
+    // Check if index is valid
+    if (index < 0 || index >= items.length) {
+      log('❌ Index $index out of bounds');
       return null;
     }
 
-    // Check if we have data for this index
-    if (controller.items.isEmpty) {
+    if (items.isEmpty) {
       log('❌ No items available');
       return null;
     }
 
-    final c = controller.items[localIndex];
-    // log('✅ Rendering row: ${c.name} (localIndex: $localIndex)');
+    final c = items[index];
 
     return DataRow.byIndex(
       index: index,
-      selected: controller.selected.contains(c.id),
+      selected: selectedIds.contains(c.id),
       onSelectChanged: (v) {
-        controller.toggleSelect(c.id, v ?? false);
+        onToggleSelect?.call(c.id, v ?? false);
       },
       cells: [
         DataCell(
@@ -135,8 +104,8 @@ class CategoryTableSource extends DataTableSource {
         DataCell(_statusPill(c.isActive)),
         DataCell(
           Text(
-            // ignore: unnecessary_null_comparison
-            c.createdAt != null ? _fmt.format(c.createdAt) : '—',
+            // c.createdAt  ? _fmt.format(c.createdAt) : '—',
+            _fmt.format(c.createdAt),
             style: const TextStyle(color: AppColors.text),
           ),
         ),
@@ -160,7 +129,7 @@ class CategoryTableSource extends DataTableSource {
                   size: 20,
                   color: AppColors.icon,
                 ),
-                onPressed: () => controller.toggleStatus(c),
+                onPressed: () => onToggleStatus?.call(c),
               ),
               IconButton(
                 tooltip: 'Edit',
@@ -169,10 +138,7 @@ class CategoryTableSource extends DataTableSource {
                   size: 20,
                   color: AppColors.icon,
                 ),
-                onPressed: () {
-                  controller.loadCategoryForEdit(c);
-                  Get.find<CategoryScreenController>().goEdit(c.id);
-                },
+                onPressed: () => onEdit?.call(c),
               ),
             ],
           ),
@@ -185,8 +151,8 @@ class CategoryTableSource extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => controller.total.value;
+  int get rowCount => items.length;
 
   @override
-  int get selectedRowCount => controller.selected.length;
+  int get selectedRowCount => selectedIds.length;
 }

@@ -2,7 +2,7 @@
 import 'package:get/get.dart';
 
 class CategoryScreenController extends GetxController {
-  final RxInt currentIndex = 0.obs; // 0=list, 1=form
+  final RxInt currentIndex = 0.obs; 
   final RxString editId = ''.obs;
   final RxBool isEditing = false.obs;
 

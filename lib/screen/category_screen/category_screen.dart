@@ -1,12 +1,12 @@
 import 'package:dashboard_admin/core/utils/app_colors.dart';
 import 'package:dashboard_admin/screen/category_screen/category_screen_controller.dart';
 import 'package:dashboard_admin/screen/category_screen/controller/category_controller.dart';
-import 'package:dashboard_admin/widgets/category_table_source.dart';
+import 'package:dashboard_admin/widgets/category_table_source.dart'; // Your new static table source
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// ---------------------------
-/// Page with PaginatedDataTable in a styled Container
+/// Updated CategoryPage with Static CategoryTableSource
 /// ---------------------------
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -15,7 +15,7 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  late final CategoryTableSource _source;
+  CategoryTableSource? _source;
   final _searchCtrl = TextEditingController();
   int? _sortColumnIndex;
   bool _sortAscending = false;
@@ -23,15 +23,13 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    final ctrl = Get.find<CategoryController>();
-    _source = CategoryTableSource(ctrl); 
-    _searchCtrl.addListener(() => setState(() {})); 
-    ctrl.load();
+    _searchCtrl.addListener(() => setState(() {}));
+    Get.find<CategoryController>().load();
   }
 
   @override
   void dispose() {
-    _source.dispose(); 
+    _source?.dispose();
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -46,6 +44,24 @@ class _CategoryPageState extends State<CategoryPage> {
       }
     });
     Get.find<CategoryController>().setSort(field, _sortAscending);
+  }
+
+  CategoryTableSource _createDataSource(CategoryController ctrl) {
+    return CategoryTableSource(
+      items: ctrl.items,
+      selectedIds: ctrl.selected,
+      onToggleSelect: (id, selected) {
+        ctrl.toggleSelect(id, selected);
+        setState(() {});
+      },
+      onToggleStatus: (category) {
+        ctrl.toggleStatus(category);
+      },
+      onEdit: (category) {
+        ctrl.loadCategoryForEdit(category);
+        Get.find<CategoryScreenController>().goEdit(category.id);
+      },
+    );
   }
 
   @override
@@ -79,6 +95,10 @@ class _CategoryPageState extends State<CategoryPage> {
             ),
           );
         }
+
+        // Recreate data source when data changes
+        _source = _createDataSource(ctrl);
+
         return Stack(
           children: [
             SingleChildScrollView(
@@ -94,7 +114,7 @@ class _CategoryPageState extends State<CategoryPage> {
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -164,7 +184,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           onChanged: ctrl.setIsActiveFilter,
                         ),
                         const Spacer(),
-                        // --- CHANGED: Bulk Delete only
+                        // Bulk Delete
                         Obx(() {
                           final count = ctrl.selected.length;
                           final hasSel = count > 0;
@@ -248,7 +268,7 @@ class _CategoryPageState extends State<CategoryPage> {
                             AppColors.icon,
                           ),
                           overlayColor: WidgetStateProperty.all(
-                            Colors.black.withOpacity(.05),
+                            Colors.black.withValues(alpha: 0.05),
                           ),
                         ),
                       ),
@@ -299,8 +319,10 @@ class _CategoryPageState extends State<CategoryPage> {
                             : 'Filtered (query: "${ctrl.search.value}")',
                         style: const TextStyle(color: AppColors.text),
                       ),
-                      onSelectAll: (v) => ctrl.selectAllOnPage(v ?? false),
-
+                      onSelectAll: (v) {
+                        ctrl.selectAllOnPage(v ?? false);
+                        setState(() {}); // Refresh UI to update selection
+                      },
                       columns: [
                         DataColumn(
                           label: const Text(
@@ -342,7 +364,7 @@ class _CategoryPageState extends State<CategoryPage> {
                           ),
                         ),
                       ],
-                      source: _source,
+                      source: _source!,
                       sortColumnIndex: _sortColumnIndex,
                       sortAscending: _sortAscending,
                       onPageChanged: (startIndex) {
@@ -363,7 +385,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
             if (ctrl.loading.isTrue)
               Container(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withValues(alpha: 0.5),
                 child: const Center(
                   child: CircularProgressIndicator.adaptive(),
                 ),
