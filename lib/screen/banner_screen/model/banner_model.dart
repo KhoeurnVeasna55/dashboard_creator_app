@@ -1,6 +1,7 @@
 import 'package:dashboard_admin/models/pagination_meta.dart';
 
 class BannerModel {
+  final String id;
   final String? title;
   final String? subtitle;
   final String? description;
@@ -12,6 +13,7 @@ class BannerModel {
   final DateTime? endDate;
 
   const BannerModel({
+    required this.id,
     this.title,
     this.subtitle,
     this.description,
@@ -25,6 +27,7 @@ class BannerModel {
 
   factory BannerModel.fromJson(Map<String, dynamic> json) {
     return BannerModel(
+      id: json["_id"],
       title: json["title"],
       subtitle: json["subtitle"],
       description: json["description"],

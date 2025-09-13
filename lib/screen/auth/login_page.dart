@@ -73,8 +73,8 @@ class _LoginPageState extends State<LoginPage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                theme.colorScheme.primaryContainer.withOpacity(kIsWeb ? 0.5 : 0.2),
-                theme.colorScheme.surfaceContainerHighest.withOpacity(kIsWeb ? 0.5 : 0.2),
+                theme.colorScheme.primaryContainer.withValues(alpha:  kIsWeb ? 0.5 : 0.2),
+                theme.colorScheme.surfaceContainerHighest.withValues(alpha:  kIsWeb ? 0.5 : 0.2),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                                   children: [
                                     CircleAvatar(
                                       radius: 24,
-                                      backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
+                                      backgroundColor: theme.colorScheme.primary.withValues(alpha:  0.12),
                                       child: Icon(Icons.dashboard, color: theme.colorScheme.primary),
                                     ),
                                     const SizedBox(width: 12),
@@ -142,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                                   'Welcome back! Please sign in to continue.',
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha:  0.7),
                                   ),
                                 ),
                                 const SizedBox(height: 28),
@@ -203,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
                                     onPressed: () {
-                                      // TODO: implement forgot password flow
+                                  
                                     },
                                     child: const Text('Forgot password?'),
                                   ),

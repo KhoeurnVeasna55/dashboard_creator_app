@@ -477,8 +477,7 @@ class CreateCategoryScreen extends StatelessWidget {
   Widget _buildImageSection(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final bounded = constraints
-            .hasBoundedHeight;
+        final bounded = constraints.hasBoundedHeight;
 
         Widget slot(Widget child, {double boxedHeight = 360}) {
           return bounded
@@ -506,12 +505,11 @@ class CreateCategoryScreen extends StatelessWidget {
                 'Upload an image to represent this category',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 24),
-slot(Obx(() => _buildImagePreview())),
-
+              slot(Obx(() => _buildImagePreview())),
 
               Obx(() {
                 final hasOld =
@@ -543,7 +541,9 @@ slot(Obx(() => _buildImagePreview())),
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               width: 2,
-                              color: AppColors.borderColro.withOpacity(0.3),
+                              color: AppColors.borderColro.withValues(
+                                alpha: 0.3,
+                              ),
                             ),
                           ),
                           child: Image.network(
@@ -669,7 +669,6 @@ slot(Obx(() => _buildImagePreview())),
       return _buildUploadingState();
     }
 
-    // 1) New local selection
     if (hasNew) {
       final Widget image = kIsWeb
           ? Image.memory(ic.imageBytesList.first, fit: BoxFit.cover)
@@ -710,7 +709,7 @@ slot(Obx(() => _buildImagePreview())),
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Stack(
         children: [
@@ -727,7 +726,7 @@ slot(Obx(() => _buildImagePreview())),
             child: ElevatedButton.icon(
               onPressed: onChange,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black.withOpacity(0.5),
+                backgroundColor: Colors.black.withValues(alpha: 0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -745,7 +744,7 @@ slot(Obx(() => _buildImagePreview())),
             child: ElevatedButton.icon(
               onPressed: onRemove,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.withOpacity(0.5),
+                backgroundColor: Colors.red.withValues(alpha: 0.5),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

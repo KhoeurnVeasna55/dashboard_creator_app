@@ -1,5 +1,6 @@
 // main_page.dart
 import 'package:dashboard_admin/core/routes/router_utils.dart';
+import 'package:dashboard_admin/screen/attributes/screen/main_attributes.dart';
 import 'package:dashboard_admin/screen/banner_screen/screen/main_banner_screen.dart';
 import 'package:dashboard_admin/screen/category_screen/main_category.dart';
 import 'package:dashboard_admin/screen/home_ds.dart';
@@ -15,7 +16,7 @@ const canvasColor = Color(0xFF171A3B);
 const scaffoldBackgroundColor = Color(0xFF464667);
 const accentCanvasColor = Color(0xFFFFCF00);
 const white = Colors.white;
-final actionColor = const Color(0xFFFFCF00).withOpacity(0.6);
+final actionColor = const Color(0xFFFFCF00).withValues(alpha: 0.6);
 final divider = const Divider(color: Colors.white54, height: 1);
 
 class MainPage extends StatefulWidget {
@@ -37,6 +38,8 @@ class _MainPageState extends State<MainPage> {
     final p = _normalize(path);
     if (p.startsWith('/products')) return 1;
     if (p == '/categories' || p.startsWith('/categories/')) return 2;
+    if (p == '/banners' || p.startsWith('/banners/')) return 3;
+    if (p == '/attributes' || p.startsWith('/attributes/')) return 4;
     return 0;
   }
 
@@ -48,6 +51,10 @@ class _MainPageState extends State<MainPage> {
         return '/products';
       case 2:
         return '/categories';
+      case 3:
+        return '/banners';
+      case 4:
+        return '/attributes';
       default:
         return '/dashboard';
     }
@@ -142,10 +149,12 @@ class _MainPageState extends State<MainPage> {
                     case 1:
                       return MainProductScreen();
                     case 2:
-                      return const MainCategory();
+                      return MainCategory();
 
                     case 3:
                       return MainBannerScreen();
+                    case 4:
+                      return MainAttributes();
                     default:
                       return const Center(child: Text('Page not found'));
                   }
@@ -214,7 +223,7 @@ class ExampleSidebarX extends StatelessWidget {
           ],
         ),
         iconTheme: IconThemeData(
-          color: Colors.white.withOpacity(0.7),
+          color: Colors.white.withValues(alpha: 0.7),
           size: 20,
         ),
       ),
@@ -254,7 +263,13 @@ class ExampleSidebarX extends StatelessWidget {
         SidebarXItem(
           icon: LucideIcons.image,
           label: 'Banner',
-        )
+          onTap: () => Future.microtask(() => _controller.selectIndex(3)),
+        ),
+        SidebarXItem(
+          icon: LucideIcons.image,
+          label: 'Attributes',
+          onTap: () => Future.microtask(() => _controller.selectIndex(4)),
+        ),
       ],
     );
   }
@@ -268,9 +283,10 @@ String getTitleByIndex(int index) {
       return 'Products';
     case 2:
       return 'Categories';
-
     case 3:
       return 'Banner';
+    case 4:
+      return "Attributes";
     default:
       return 'Not found page';
   }

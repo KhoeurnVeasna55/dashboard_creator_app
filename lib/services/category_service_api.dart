@@ -59,6 +59,7 @@ class CategoryServiceApi {
           title: "Success",
           description: json.decode(resp.body)['message'],
         );
+        log('Working');
       }
       if (resp.statusCode != 200) {
         throw Exception(
@@ -184,77 +185,77 @@ class CategoryServiceApi {
     }
   }
 
-  Future<Category?> updateCategoryWithImage({
-    required String id,
-    required String name,
-    String? description,
-    bool? isActive,
-    File? imageFile,
-    Uint8List? imageBytes,
-    String? fileName,
-  }) async {
-    try {
-      final token = await StoreToken().getToken();
-      final uri = Uri.parse('$URL/api/categories/$id');
+  // Future<Category?> updateCategoryWithImage({
+  //   required String id,
+  //   required String name,
+  //   String? description,
+  //   bool? isActive,
+  //   File? imageFile,
+  //   Uint8List? imageBytes,
+  //   String? fileName,
+  // }) async {
+  //   try {
+  //     final token = await StoreToken().getToken();
+  //     final uri = Uri.parse('$URL/api/categories/$id');
 
-      // Create multipart request
-      final request = http.MultipartRequest('PUT', uri);
+  //     // Create multipart request
+  //     final request = http.MultipartRequest('PUT', uri);
 
-      // Add headers
-      final headers = header(token: token ?? "");
-      request.headers.addAll(headers);
+  //     // Add headers
+  //     final headers = header(token: token ?? "");
+  //     request.headers.addAll(headers);
 
-      // Add form fields
-      request.fields.addAll({
-        'name': name,
-        if (description != null) 'description': description,
-        if (isActive != null) 'isActive': isActive.toString(),
-        'folder': 'categories',
-      });
+  //     // Add form fields
+  //     request.fields.addAll({
+  //       'name': name,
+  //       if (description != null) 'description': description,
+  //       if (isActive != null) 'isActive': isActive.toString(),
+  //       'folder': 'categories',
+  //     });
 
-      // Add image file if provided
-      if (kIsWeb && imageBytes != null) {
-        request.files.add(
-          http.MultipartFile.fromBytes(
-            'file',
-            imageBytes,
-            filename: fileName ?? 'category-image.jpg',
-          ),
-        );
-      } else if (imageFile != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath('file', imageFile.path),
-        );
-      }
+  //     // Add image file if provided
+  //     if (kIsWeb && imageBytes != null) {
+  //       request.files.add(
+  //         http.MultipartFile.fromBytes(
+  //           'file',
+  //           imageBytes,
+  //           filename: fileName ?? 'category-image.jpg',
+  //         ),
+  //       );
+  //     } else if (imageFile != null) {
+  //       request.files.add(
+  //         await http.MultipartFile.fromPath('file', imageFile.path),
+  //       );
+  //     }
 
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
+  //     final response = await request.send();
+  //     final responseBody = await response.stream.bytesToString();
 
-      if (response.statusCode == 200) {
-        final data = json.decode(responseBody);
-        CustomToastNoti.show(
-          title: 'Success',
-          description: 'Category updated successfully!',
-        );
-        return Category.fromJson(data);
-      } else {
-        final errorData = json.decode(responseBody);
-        CustomToastNoti.show(
-          title: 'Error',
-          description: errorData['message'] ?? 'Failed to update category',
-        );
-        log('Failed to update category: $responseBody');
-        return null;
-      }
-    } catch (e) {
-      log('Error updating category with image: $e');
-      CustomToastNoti.show(
-        title: 'Error',
-        description: 'Network error: Failed to update category',
-      );
-      return null;
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(responseBody);
+  //       CustomToastNoti.show(
+  //         title: 'Success',
+  //         description: 'Category updated successfully!',
+  //       );
+  //       return Category.fromJson(data);
+  //     } else {
+  //       final errorData = json.decode(responseBody);
+  //       CustomToastNoti.show(
+  //         title: 'Error',
+  //         description: errorData['message'] ?? 'Failed to update category',
+  //       );
+  //       log('Failed to update category: $responseBody');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     log('Error updating category with image: $e');
+  //     CustomToastNoti.show(
+  //       title: 'Error',
+  //       description: 'Network error: Failed to update category',
+  //     );
+  //     return null;
+  //   }
+  // }
 
   Future<Category?> createCategory(
     String name,
@@ -278,10 +279,10 @@ class CategoryServiceApi {
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
-        CustomToastNoti.show(
-          title: 'Success',
-          description: 'Category created successfully!',
-        );
+        // CustomToastNoti.show(
+        //   title: 'Success',
+        //   description: 'Category created successfully!',
+        // );
         return Category.fromJson(data);
       } else {
         final errorData = json.decode(response.body);

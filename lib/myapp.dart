@@ -38,7 +38,10 @@ class _MyAppState extends State<MyApp> {
           title: 'Flutter Demo',
           initialBinding: Binding(),
           theme: AppTheme.lightTheme,
-          home: SelectionArea(child: authController.isLogin.isTrue ? MainPage() : LoginPage()),
+          home: SelectionArea(
+            child: authController.isLogin.isTrue ? MainPage() : LoginPage(),
+          ),
+         
         ),
       ),
     );
